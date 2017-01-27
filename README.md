@@ -10,13 +10,18 @@ This plugin let's you create basic symbols that adjust to the dimensions of the 
 
 ## Updates
 
-Version 1.0
+### Version 1.1
+* Optimized detection logic of text layer
+* Symbol can now easily be updated when the text layer name is changed (Cmd + Alt + D)
+* Icon support
+
+### Version 1.0
 * First Version
 * Basic updating of dimensions
 * Helper to create symbol
 
 ## Todos
-- [ ] Allow more then two layers (e.g. for buttons with icons)
+- [x] Allow more then two layers (e.g. for buttons with icons)
 - [ ] Try to get the button padding not from the layer's name but from the it's dimensions
 
 
