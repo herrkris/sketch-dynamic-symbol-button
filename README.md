@@ -4,11 +4,11 @@ Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5.
 
 # Dynamic symbol button for Sketch 3.5+
 
+[Download](https://github.com/herrkris/sketch-dynamic-symbol-button/archive/master.zip)
+
 This plugin creates a dynamic button as a symbol and updates it if the overrides changes.
 
 ## Updates
-
-[Download](https://github.com/herrkris/sketch-dynamic-symbol-button/archive/master.zip)
 
 Version 1.0
 * First Version
