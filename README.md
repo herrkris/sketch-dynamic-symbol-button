@@ -26,7 +26,7 @@ This plugin let's you create basic symbols that adjust to the dimensions of the 
 
 
 ## Demo
-![Demo](https://cloud.githubusercontent.com/assets/9323/22371579/2c76c3a2-e498-11e6-8baa-6bf0c9e553ae.gif)
+![Demo](https://cloud.githubusercontent.com/assets/9323/22391116/93d0af34-e4ef-11e6-9d58-cd2796bb6033.gif)
 
 
 
