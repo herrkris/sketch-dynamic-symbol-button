@@ -1,0 +1,37 @@
+{
+  "name": "Dynamic Button Symbol",
+  "author": "Kristof Dreier",
+  "authorEmail": "kontakt@kristofdreier.de",
+  "homepage": "https://github.com/herrkris/sketch-dynamic-button-symbol",
+  "version": "1.0",
+  "bundleVersion": "1.0",
+  "compatibleVersion": 3.5,
+  "identifier": "dreier.kristof.rbs",
+  "commands": [
+    {
+      "script": "script.cocoascript",
+      "handlers": {
+        "run": "onRun"
+      },
+      "shortcut": "cmd j",
+      "name": "Update Dimensions",
+      "identifier": "resizeSymbolButton"
+    },
+
+    {
+      "script": "script.cocoascript",
+      "handlers": {
+        "run": "onCreate"
+      },
+      "name": "Create Symbol",
+      "identifier": "createSymbolButton"
+    }
+  ],
+  "menu": {
+    "items": [
+      "createSymbolButton",
+      "resizeSymbolButton"
+    ],
+    "title": "Dynamic Symbol Button"
+  }
+}
