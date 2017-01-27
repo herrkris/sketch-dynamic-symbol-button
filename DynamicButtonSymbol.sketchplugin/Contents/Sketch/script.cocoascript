@@ -3,47 +3,82 @@
   Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5
 */
 
+
 function alert(msg, title) {
-  title = title || "alert";
+  title = title || 'alert';
   var app = [NSApplication sharedApplication];
   [app displayDialog:msg withTitle:title];
 }
 
-function getButtonDimensionsForLayer(layer){
-  log("getButtonDimensionsForLayer: " + [layer frame])
+function isDimensionLayer(layer) {
+  var klass = [layer class];
+  var layerName = [layer name];
+  return klass == 'MSTextLayer' && layerName.match(/^(?:(\d{1,2}):)?(?:(\d{1,2}):)?(?:(\d{1,2}):)?(?:(\d{1,2})+)$/);
+}
+
+function findTextLayer(layers) {
+  return layers.reduce(function(prev, current) {
+    if (isDimensionLayer(current)) {
+      prev = current;
+    }
+
+    return prev;
+  }, []);
+}
+
+function findBackgroundLayer(layer) {
+  var layers = layer.parentGroup().layers()
+  return layers[0];
+}
+
+function findSymbol(layer) {
+  if (layer) {
+    var klass = [layer class];
+    if (klass == 'MSSymbolMaster' || klass == 'MSSymbolInstance') {
+      return layer;
+    }
+
+    return findSymbol([layer parentGroup]);
+  }
+
+  return null
+}
+
+function getButtonDimensionsForLayer(layer) {
   var frame = [layer frame]
-  var layerHeight = [frame height],
-      layerWidth =  [frame width],
-      layerX =      [frame x],
-      layerY =      [frame y]
+  var layerHeight = [frame height];
+  var layerWidth = [frame width];
+  var layerX = [frame x];
+  var layerY = [frame y];
+  var layerName = [layer name];
+  var splitLayer = (layerName.match(/^(?:(\d{1,2}):)?(?:(\d{1,2}):)?(?:(\d{1,2}):)?(?:(\d{1,2})+)$/) || []).slice(1);
+  var offsetTop, offsetRight, offsetRight, offsetLeft;
 
-
-  var splitLayer = [layer name].split(':');
-  var offsetTop,offsetRight,offsetRight,offsetLeft;
   switch(splitLayer.length) {
     case 1:
-      defVal = parseInt(splitLayer[0]) || 20;
+      defVal = parseInt(splitLayer[0], 10) || 20;
       layer.name = defVal + ':' + defVal;
       offsetTop = offsetBottom = offsetRight = offsetLeft = defVal;
-      break;
+    break;
     case 2:
       offsetTop = offsetBottom = parseInt(splitLayer[0]) || 0;
       offsetRight = offsetLeft = parseInt(splitLayer[1]) || 0;
-      break;
+    break;
     case 3:
       offsetTop = parseInt(splitLayer[0]) || 0;
       offsetRight = offsetLeft = parseInt(splitLayer[1]) || 0;
       offsetBottom = parseInt(splitLayer[2]) || 0;
-      break;
+    break;
     case 4:
       offsetTop = parseInt(splitLayer[0]) || 0;
       offsetRight = parseInt(splitLayer[1]) || 0;
       offsetBottom = parseInt(splitLayer[2]) || 0;
       offsetLeft = parseInt(splitLayer[3]) || 0;
-      break;
+    break;
     default:
-      alert('Wrong format', 'Error');
+      alert('Check the format of your text layer.', 'Error');
   }
+
   return {
     x: layerX,
     y: layerY,
@@ -58,98 +93,199 @@ function getButtonDimensionsForLayer(layer){
   }
 }
 
-function onRun(context) {
-  var selection = context.selection;
-  var doc = context.document;
+function getMasterForSymbol(symbol) {
+  if (symbol) {
+    return [symbol symbolMaster];
+  }
 
-  if ([selection count] == 0) {
-    alert('You need to select a Button Symbol', 'Selection is empty');
+  return null;
+}
+
+function getButtonText(symbol) {
+  var text = '';
+
+  if (symbol) {
+    var overrides = symbol.overrides();
+    log(symbol)
+    var textOverride = overrides.objectForKey(0);
+    text = textOverride ? [[textOverride allValues] objectAtIndex:0] : text;
+  }
+
+  return text;
+}
+
+function getDimensionsForTextLayerWithText(layer, text) {
+  var symbolTextValue = layer.stringValue();
+  layer.setStringValue(text);
+  var textDimensions = getButtonDimensionsForLayer(layer);
+  var dimensions = {
+    totalHeight: textDimensions.totalHeight,
+    totalWidth: textDimensions.totalWidth
+  };
+  layer.setStringValue(symbolTextValue);
+
+  return dimensions;
+}
+
+function createTextLayer(parent, padding) {
+  var textLayer = MSTextLayer.new();
+
+  textLayer.setStringValue('|');
+  textLayer.name = padding.top + ':' +  padding.right + ':' + padding.bottom + ':' + padding.left;
+  // Pin to corner
+  textLayer.resizingType = 1;
+
+  return textLayer;
+}
+
+function createBackground(parent, textLayer, padding) {
+  var rect = textLayer.rect();
+  var style = MSDefaultStyle.defaultStyle();
+  var rectShape = MSRectangleShape.alloc().init();
+  var container = MSShapeGroup.alloc().init();
+  var addedHeight = padding.top + padding.bottom;
+  var addedWidth = padding.left + padding.right;
+  rectShape.frame = MSRect.rectWithRect(rect);
+
+  container.addLayers([rectShape]);
+  container.style().addStylePartOfType(0);
+  container.name = 'Button';
+  container.resizeToFitChildrenWithOption(1);
+
+  var fill = container.style().fills().firstObject();
+  fill.color = MSColor.colorWithRed_green_blue_alpha(.8, .8, .8, 1);
+
+  var frame = [container frame];
+  var textHeight = [[textLayer frame] height];
+  var textWidth = [[textLayer frame] width];
+  [frame setHeight:textHeight + addedHeight];
+  [frame  setWidth:textWidth + addedWidth + 500];
+  frame.x = -padding.left;
+  frame.y = -padding.top;
+
+  return container;
+}
+
+function getPaddingFromUser(context) {
+  var sketch = context.api();
+
+  var paddingLeft = sketch.getStringFromUser('Padding left', '10');
+  var paddingRight = paddingLeft ? sketch.getStringFromUser('Padding right', '10') : null;
+  var paddingTop = paddingRight ? sketch.getStringFromUser('Padding top', '10') : null;
+  var paddingBottom = paddingTop ? sketch.getStringFromUser('Padding bottom', '10') : null;
+
+  if (paddingLeft && paddingRight && paddingTop && paddingBottom) {
+    return {
+      top: parseInt(paddingTop, 10),
+      right: parseInt(paddingRight, 10),
+      bottom: parseInt(paddingBottom, 10),
+      left: parseInt(paddingLeft, 10)
+    };
+  }
+
+  return null;
+}
+
+function createButtonSymbol(context) {
+  var doc = context.document;
+  var page = doc.currentPage();
+  var padding = getPaddingFromUser(context);
+
+  // If user cancels one of the dialogs we'll just exit
+  if (!padding) {
     return;
   }
-  var symbol = selection[0];
-  if (symbol) {
-    var master = [symbol symbolMaster];
-    var layers = master.layers();
-    var overrides = symbol.overrides();
-    var textOverride = overrides.objectForKey(0);
-    if (textOverride) {
-      var text = [[textOverride allValues] objectAtIndex:0];
 
-      var layer = layers[1];
-      var oldValue = layer.stringValue();
-      layer.setStringValue(text);
-      var buttonDimensions = getButtonDimensionsForLayer(layer)
-      var frame = [symbol frame]
-      [frame setHeight:buttonDimensions.totalHeight]
-      [frame setWidth:buttonDimensions.totalWidth]
-      layer.setStringValue(oldValue);
-    }
+  var textLayer = createTextLayer(page, padding);
+  var backgroundLayer = createBackground(page, textLayer, padding);
+
+  page.addLayers([backgroundLayer, textLayer]);
+  textLayer.setIsSelected(true);
+  backgroundLayer.setIsSelected(true);
+
+  var symbolAction = doc.actionsController().actionWithID('MSCreateSymbolAction');
+  // If for som reason we can't perform the symbol creation, exit with an alert
+  // and rollback the changes we made
+  if (!symbolAction.validate()) {
+    page.removeLayer_(textLayer);
+    page.removeLayer_(backgroundLayer);
+    alert('Could not create symbol.', 'Symbol');
+    return;
+  }
+
+  symbolAction.doPerformAction(nil);
+}
+
+function updateBackground(layer, dimensions) {
+  var frame = [layer frame];
+  [frame setHeight:dimensions.totalHeight];
+  [frame  setWidth:dimensions.totalWidth + 500];
+  frame.x = -(dimensions.offsetLeft - dimensions.x);
+  frame.y = -(dimensions.offsetTop - dimensions.y);
+}
+
+function onRun(context) {
+  var selection = context.selection;
+
+  if ([selection count] == 0) {
+    alert('You need to select a button symbol.', 'Empty selection');
+    return;
+  }
+
+  var symbol = findSymbol(selection[0]);
+  var master = getMasterForSymbol(symbol);
+
+  if (master) {
+    var layers = master.layers();
+    var layer = findTextLayer(layers);
+    var text = getButtonText(symbol);
+    var dimensions = getDimensionsForTextLayerWithText(layer, text);
+    var frame = [symbol frame];
+
+    [frame setHeight:dimensions.totalHeight]
+    [frame setWidth:dimensions.totalWidth]
   }
 }
 
 function onCreate(context) {
-  var sketch = context.api();
-  var doc = context.document;
-  var page = doc.currentPage();
+  createButtonSymbol(context);
+}
 
-  var paddingLeft = sketch.getStringFromUser("Padding left", "10");
-  var paddingRight = sketch.getStringFromUser("Padding right", "10");
-  var paddingTop = sketch.getStringFromUser("Padding top", "10");
-  var paddingBottom = sketch.getStringFromUser("Padding bottom", "10");
-  var padding = {
-    top: parseInt(paddingTop, 10),
-    right: parseInt(paddingRight, 10),
-    bottom: parseInt(paddingBottom, 10),
-    left: parseInt(paddingLeft, 10)
-  };
+function onUpdateDimensions(context) {
+    var selection = context.selection;
 
-  var textLayer = addTextLayer(page, padding);
-  var rectLayer = addLayerOfRectType(page, textLayer, padding);
-
-  page.addLayers([rectLayer, textLayer]);
-  textLayer.setIsSelected(true);
-  rectLayer.setIsSelected(true);
-
-  var symbols = doc.documentData().layerSymbols()
-  var symbolAction = doc.actionsController().actionWithID("MSCreateSymbolAction");
-  if (!symbolAction.validate()) {
-    exitWithAlert('Could not create symbol.')
+  if ([selection count] == 0) {
+    alert('You need to select a button symbol.', 'Empty selection');
+    return;
   }
-  symbolAction.doPerformAction(nil)
-}
 
-function addTextLayer(parent, padding) {
-  var textLayer = MSTextLayer.new();
-  textLayer.setStringValue('|');
-  textLayer.name = padding.top + ":" +  padding.right + ":" + padding.bottom + ":" + padding.left;
-  textLayer.resizingType = 1;
-  return textLayer;
-}
+  var symbol = findSymbol(selection[0]);
 
-function addLayerOfRectType(parent, textLayer, padding) {
-    var rect = textLayer.rect();
-    var style = MSDefaultStyle.defaultStyle();
-    var rectShape = MSRectangleShape.alloc().init();
-    var container = MSShapeGroup.alloc().init();
-    var addedHeight = padding.top + padding.bottom;
-    var addedWidth = padding.left + padding.right;
-    rectShape.frame = MSRect.rectWithRect(rect);
+  if (symbol) {
+    var layers = symbol.layers();
+    var layer = findTextLayer(layers);
+    var dimensions = getButtonDimensionsForLayer(layer);
+    var backgroundLayer = findBackgroundLayer(layer);
+    updateBackground(backgroundLayer, dimensions);
 
-    container.addLayers([rectShape]);
-    container.style().addStylePartOfType(0);
-    container.name = "BG";
-    container.resizeToFitChildrenWithOption(1);
+    var backgroundRect = MSRect.rectWithRect([backgroundLayer rect]);
+    var backgroundWidth = [backgroundRect width];
+    var backgroundHeight = [backgroundRect height];
+    backgroundRect.setY(0);
+    backgroundRect.setX(0);
+    backgroundLayer.frame = MSRect.rectWithRect([backgroundRect rect]);
 
-    var fill = container.style().fills().firstObject();
-    fill.color = MSColor.colorWithRed_green_blue_alpha(.8, .8, .8, 1);
+    var textRect = MSRect.rectWithRect([layer rect]);
+    textRect.setY(dimensions.offsetTop);
+    textRect.setX(dimensions.offsetLeft);
+    layer.frame = MSRect.rectWithRect([textRect rect]);
 
-    var frame = [container frame];
-    var textHeight = [[textLayer frame] height];
-    var textWidth = [[textLayer frame] width];
-    [frame setHeight:textHeight + addedHeight]
-    [frame  setWidth:textWidth + addedWidth + 500]
-    frame.x = -padding.left;
-    frame.y = -padding.top;
+    var symbol = findSymbol(layer);
+    var symbolRect = MSRect.rectWithRect([symbol rect]);
+    symbolRect.setWidth(backgroundWidth);
+    symbolRect.setHeight(backgroundHeight);
 
-    return container;
+    symbol.frame = MSRect.rectWithRect([symbolRect rect]);
+    symbol.setIsSelected(true);
+  }
 }
