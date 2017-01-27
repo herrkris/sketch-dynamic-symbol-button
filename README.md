@@ -8,10 +8,16 @@ This plugin creates a dynamic button as a symbol and updates it if the overrides
 
 ## Updates
 
+[Download](https://github.com/herrkris/sketch-dynamic-symbol-button/archive/master.zip)
+
 Version 1.0
 * First Version
-* [Download](https://github.com/herrkris/sketch-dynamic-symbol-button/archive/master.zip)
-* [Demo](https://cloud.githubusercontent.com/assets/9323/22371579/2c76c3a2-e498-11e6-8baa-6bf0c9e553ae.gif)
+* Basic updating of dimensions
+* Helper to create symbol
+
+
+## Demo
+![Demo](https://cloud.githubusercontent.com/assets/9323/22371579/2c76c3a2-e498-11e6-8baa-6bf0c9e553ae.gif)
 
 
 
