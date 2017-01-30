@@ -7,7 +7,7 @@ Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5.
 [Download](https://github.com/herrkris/sketch-dynamic-symbol-button/archive/master.zip)
 
 This plugin let's you create basic symbols that adjust to the dimensions of the text layer. Something like Dynamic Button but with symbols.
-For a more in depth look you can [read my post about it](https://github.com/herrkris/sketch-dynamic-symbol-button).
+For a more in depth look you can [read my post about it](http://blog.herrkris.de/dynamic-buttons-with-symbols-and-sketch/).
 
 ## Updates
 
