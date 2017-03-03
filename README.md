@@ -30,7 +30,7 @@ For a more in depth look you can [read my post about it](http://blog.herrkris.de
 ## Todos
 - [x] Allow more then two layers (e.g. for buttons with icons)
 - [x] Try to get the button padding not from the layer's name but from the it's dimensions
-
+- [ ] Add support for child symbols
 
 ## Demo
 ![Demo](https://cloud.githubusercontent.com/assets/9323/22391116/93d0af34-e4ef-11e6-9d58-cd2796bb6033.gif)
