@@ -91,9 +91,9 @@ function getButtonText(symbol) {
   var text = '';
 
   if (symbol) {
-    var overrides = symbol.overrides().objectForKey(0);
-    NSLog(@"%s", overrides);
+    var overrides = symbol.overrides();
     overrides = [overrides allValues];
+    NSLog(@"%@", overrides);
 
     text = overrides.reduce(function(prev, current) {
       var className = getClassName(current);
@@ -111,7 +111,6 @@ function getButtonText(symbol) {
 function getDimensionsForTextLayerWithText(layer, text) {
   var oldTextDimensions = getButtonDimensionsForLayer(layer);
   var symbolTextValue = layer.stringValue();
-  var resizingType = layer.resizingType;
   layer.setStringValue(text);
   var newTextDimensions = getButtonDimensionsForLayer(layer);
 
@@ -121,17 +120,6 @@ function getDimensionsForTextLayerWithText(layer, text) {
   };
   layer.setStringValue(symbolTextValue);
 
-  // if the left and right offsets are the same, we need to change the resizingType
-  // to "Resize object" in order to display the button correctly
-  if (oldTextDimensions.offsetLeft == oldTextDimensions.offsetRight && resizingType != 2) {
-    layer.resizingType = 2;
-  }
-  // if the left and right offsets differ, we need to change the resizingType
-  // to "Pin to corner" in order to display the button correctly
-   else if (oldTextDimensions.offsetLeft != oldTextDimensions.offsetRight && resizingType != 1) {
-    layer.resizingType = 1;
-  }
-
   return dimensions;
 }
 
@@ -140,7 +128,6 @@ function createTextLayer(parent, padding) {
 
   textLayer.setStringValue('Button');
   textLayer.name = 'Button';
-  textLayer.resizingType = 2;
 
   return textLayer;
 }
