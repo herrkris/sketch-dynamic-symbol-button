@@ -11,6 +11,9 @@ For a more in depth look you can [read my post about it](http://blog.herrkris.de
 
 ## Updates
 
+### Version 1.2
+* Support Sketch 43 and 44
+
 ### Version 1.1
 * Optimized detection logic of text layer
 * Symbol can now easily be updated when the text layer name is changed (Cmd + Alt + D)
