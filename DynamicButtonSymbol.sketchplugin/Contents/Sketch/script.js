@@ -1,6 +1,7 @@
 /*
   Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5
 */
+@import 'libs/functions.js';
 
 function alert(msg, title) {
   title = title || 'alert';
@@ -91,6 +92,7 @@ function getButtonText(symbol) {
 
   if (symbol) {
     var overrides = symbol.overrides().objectForKey(0);
+    NSLog(@"%s", overrides);
     overrides = [overrides allValues];
 
     text = overrides.reduce(function(prev, current) {
@@ -208,7 +210,7 @@ function createButtonSymbol(context) {
   textLayer.setIsSelected(true);
   backgroundLayer.setIsSelected(true);
 
-  var symbolAction = doc.actionsController().actionWithID('MSCreateSymbolAction');
+  var symbolAction = actionWithType('MSCreateSymbolAction', context);
   // If for som reason we can't perform the symbol creation, exit with an alert
   // and rollback the changes we made
   if (!symbolAction.validate()) {

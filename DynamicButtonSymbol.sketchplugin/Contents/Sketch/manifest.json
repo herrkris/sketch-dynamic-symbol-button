@@ -8,7 +8,7 @@
   "identifier": "dreier.kristof.rbs",
   "commands": [
     {
-      "script": "script.cocoascript",
+      "script": "script.js",
       "handlers": {
         "run": "onRun"
       },
@@ -17,7 +17,7 @@
       "identifier": "resizeSymbolButton"
     },
     {
-      "script": "script.cocoascript",
+      "script": "script.js",
       "handlers": {
         "run": "onCreate"
       },
