@@ -3,8 +3,8 @@
   "author": "Kristof Dreier",
   "authorEmail": "kontakt@kristofdreier.de",
   "homepage": "https://github.com/herrkris/sketch-dynamic-button-symbol",
-  "version": "1.1.1",
-  "bundleVersion": "1.1.1",
+  "version": "1.1.2",
+  "bundleVersion": "1.1.2",
   "compatibleVersion": 3.5,
   "identifier": "dreier.kristof.rbs",
   "commands": [
