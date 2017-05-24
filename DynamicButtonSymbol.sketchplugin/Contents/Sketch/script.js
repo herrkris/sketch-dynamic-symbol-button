@@ -91,13 +91,11 @@ function getButtonText(symbol) {
   var text = '';
 
   if (symbol) {
-    var overrides = symbol.overrides();
-    overrides = [overrides allValues];
-    NSLog(@"%@", overrides);
+    var overrides = symbol.overrides().allValues();
 
     text = overrides.reduce(function(prev, current) {
       var className = getClassName(current);
-      if (className == '__NSCFString' || className == 'NSTaggedPointerString') {
+      if (className == '__NSCFString' || className == 'NSTaggedPointerString' || className == '__NSCFConstantString') {
         prev = current
       }
 
