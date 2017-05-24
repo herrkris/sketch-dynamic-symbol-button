@@ -3,6 +3,19 @@
   Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5
 */
 
+function actionWithType(type, context) {
+  var doc = context.document;
+  var controller = doc.actionsController();
+
+  if (controller.actionWithName) {
+    return controller.actionWithName(type);
+  } else if (controller.actionWithID) {
+    return controller.actionWithID(type);
+  } else {
+    return controller.actionForID(type);
+  }
+}
+
 
 function alert(msg, title) {
   title = title || 'alert';
@@ -105,10 +118,16 @@ function getButtonText(symbol) {
   var text = '';
 
   if (symbol) {
-    var overrides = symbol.overrides();
-    log(symbol)
-    var textOverride = overrides.objectForKey(0);
-    text = textOverride ? [[textOverride allValues] objectAtIndex:0] : text;
+    var overrides = symbol.overrides().allValues();
+
+    text = overrides.reduce(function(prev, current) {
+      var className = [current class];
+      if (className == '__NSCFString' || className == 'NSTaggedPointerString' || className == '__NSCFConstantString') {
+        prev = current
+      }
+
+      return prev;
+    }, '');
   }
 
   return text;
@@ -132,8 +151,6 @@ function createTextLayer(parent, padding) {
 
   textLayer.setStringValue('|');
   textLayer.name = padding.top + ':' +  padding.right + ':' + padding.bottom + ':' + padding.left;
-  // Pin to corner
-  textLayer.resizingType = 1;
 
   return textLayer;
 }
@@ -203,7 +220,7 @@ function createButtonSymbol(context) {
   textLayer.setIsSelected(true);
   backgroundLayer.setIsSelected(true);
 
-  var symbolAction = doc.actionsController().actionWithID('MSCreateSymbolAction');
+  var symbolAction = actionWithType('MSCreateSymbolAction', context);
   // If for som reason we can't perform the symbol creation, exit with an alert
   // and rollback the changes we made
   if (!symbolAction.validate()) {
