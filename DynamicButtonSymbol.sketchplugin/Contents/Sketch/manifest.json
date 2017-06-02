@@ -6,6 +6,7 @@
   "version": "2.0.0-beta.2",
   "compatibleVersion": 3.5,
   "identifier": "dreier.kristof.rbs",
+  "appcast": "https://api.sketchpacks.com/v1/plugins/dreier.kristof.rbs/appcast",
   "commands": [
     {
       "script": "script.js",
