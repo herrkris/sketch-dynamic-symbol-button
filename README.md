@@ -1,3 +1,5 @@
+[![Download from Sketchpacks.com](https://badges.sketchpacks.com/plugins/dreier.kristof.rbs/version.svg)](https://api.sketchpacks.com/v1/plugins/dreier.kristof.rbs/download) [![Compatible Sketch Version](https://badges.sketchpacks.com/plugins/dreier.kristof.rbs/compatibility.svg)](https://sketchpacks.com/herrkris/sketch-dynamic-symbol-button)
+
 ## Credits
 
 Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5.
