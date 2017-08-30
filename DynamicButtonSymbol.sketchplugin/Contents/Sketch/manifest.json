@@ -3,10 +3,11 @@
   "author": "Kristof Dreier",
   "authorEmail": "kontakt@kristofdreier.de",
   "homepage": "https://github.com/herrkris/sketch-dynamic-button-symbol",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "compatibleVersion": 3.5,
   "identifier": "dreier.kristof.rbs",
-  "appcast": "https://api.sketchpacks.com/v1/plugins/dreier.kristof.rbs/appcast",
+  "appcast":
+    "https://api.sketchpacks.com/v1/plugins/dreier.kristof.rbs/appcast",
   "commands": [
     {
       "script": "script.js",
@@ -27,11 +28,7 @@
     }
   ],
   "menu": {
-    "items": [
-      "createSymbolButton",
-      "updateDimensions",
-      "resizeSymbolButton"
-    ],
+    "items": ["createSymbolButton", "updateDimensions", "resizeSymbolButton"],
     "title": "Dynamic Symbol Button"
   }
 }

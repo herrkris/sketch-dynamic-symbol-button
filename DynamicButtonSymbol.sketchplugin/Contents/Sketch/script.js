@@ -2,6 +2,7 @@
   Heavily influenced by https://github.com/fuggfuggfugg/sketch-dynamic-button-3.5
 */
 @import 'libs/functions.js';
+@import 'libs/log.js';
 
 function alert(msg, title) {
   title = title || 'alert';
@@ -126,6 +127,7 @@ function createTextLayer(parent, padding) {
 
   textLayer.setStringValue('Button');
   textLayer.name = 'Button';
+  textLayer.resizingConstraint = 43;
 
   return textLayer;
 }
@@ -192,8 +194,8 @@ function createButtonSymbol(context) {
   var backgroundLayer = createBackground(page, textLayer, padding);
 
   page.addLayers([backgroundLayer, textLayer]);
-  textLayer.setIsSelected(true);
-  backgroundLayer.setIsSelected(true);
+  [textLayer select:true byExpandingSelection:false]
+  [backgroundLayer select:true byExpandingSelection:true]
 
   var symbolAction = actionWithType('MSCreateSymbolAction', context);
   // If for som reason we can't perform the symbol creation, exit with an alert
